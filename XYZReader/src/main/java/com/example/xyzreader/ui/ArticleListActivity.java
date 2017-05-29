@@ -1,11 +1,9 @@
 package com.example.xyzreader.ui;
 
-import android.app.ActivityOptions;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -16,7 +14,6 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.xyzreader.R;
@@ -144,20 +141,20 @@ public class ArticleListActivity extends ActionBarActivity implements
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-
-                        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,
-                                thumbnail,
-                                thumbnail.getTransitionName())
-                                .toBundle();
-
-                        startActivity(new Intent(Intent.ACTION_VIEW,
-                                ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))), bundle);
-                    } else {
-                        startActivity(new Intent(Intent.ACTION_VIEW,
-                                ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
-                    }
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
+//
+//                        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,
+//                                thumbnail,
+//                                thumbnail.getTransitionName())
+//                                .toBundle();
+//
+//                        startActivity(new Intent(Intent.ACTION_VIEW,
+//                                ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))), bundle);
+//                    } else {
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+//                    }
                 }
             });
             return vh;

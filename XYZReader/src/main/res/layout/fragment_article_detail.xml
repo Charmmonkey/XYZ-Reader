@@ -30,8 +30,9 @@
                     android:id="@+id/photo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
-                    android:transitionName="@string/transition_grid_image"/>
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    />
 
             </FrameLayout>
 

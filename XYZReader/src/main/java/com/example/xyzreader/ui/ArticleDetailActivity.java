@@ -40,6 +40,11 @@ public class ArticleDetailActivity extends ActionBarActivity
     private View mUpButton;
 
     @Override
+    public void onEnterAnimationComplete() {
+        super.onEnterAnimationComplete();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
