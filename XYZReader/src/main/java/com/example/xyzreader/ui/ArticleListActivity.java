@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
-import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
 
 import java.text.ParseException;
@@ -152,8 +151,9 @@ public class ArticleListActivity extends ActionBarActivity implements
 //                        startActivity(new Intent(Intent.ACTION_VIEW,
 //                                ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))), bundle);
 //                    } else {
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+//                    startActivity(new Intent(Intent.ACTION_VIEW,
+//                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+                    startActivity(new Intent(ArticleListActivity.this, MainActivity.class));
 //                    }
                 }
             });
