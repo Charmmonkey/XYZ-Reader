@@ -1,12 +1,12 @@
 package com.example.xyzreader.ui;
 
-import android.app.LoaderManager;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Html;
@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.UpdaterService;
+import com.facebook.stetho.Stetho;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,7 +32,7 @@ import java.util.GregorianCalendar;
  * touched, lead to a {@link ArticleDetailActivity} representing item details. On tablets, the
  * activity presents a grid of items as cards.
  */
-public class ArticleListActivity extends ActionBarActivity implements
+public class ArticleListActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ArticleListActivity.class.toString();
@@ -44,11 +45,13 @@ public class ArticleListActivity extends ActionBarActivity implements
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
     // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2, 1, 1);
+    public static String ACTION_ARTICLE_CLICK = "article_click";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_article_list);
 
         mToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -59,7 +62,7 @@ public class ArticleListActivity extends ActionBarActivity implements
 //        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        getLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(0, null, this);
 
         if (savedInstanceState == null) {
             refresh();
@@ -127,10 +130,12 @@ public class ArticleListActivity extends ActionBarActivity implements
             mCursor = cursor;
         }
 
+
         @Override
         public long getItemId(int position) {
             mCursor.moveToPosition(position);
-            return mCursor.getLong(ArticleLoader.Query._ID);
+            long longArticleId = mCursor.getLong(ArticleLoader.Query._ID);
+            return longArticleId;
         }
 
         @Override
@@ -151,9 +156,10 @@ public class ArticleListActivity extends ActionBarActivity implements
 //                        startActivity(new Intent(Intent.ACTION_VIEW,
 //                                ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))), bundle);
 //                    } else {
-//                    startActivity(new Intent(Intent.ACTION_VIEW,
-//                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
-                    startActivity(new Intent(ArticleListActivity.this, MainActivity.class));
+                    Log.d(TAG, "Adapter position: " + vh.getAdapterPosition());
+                    Intent intent = new Intent(ArticleListActivity.this, MainActivity.class)
+                            .putExtra(ACTION_ARTICLE_CLICK, vh.getAdapterPosition());
+                    startActivity(intent);
 //                    }
                 }
             });
@@ -201,6 +207,8 @@ public class ArticleListActivity extends ActionBarActivity implements
         public int getItemCount() {
             return mCursor.getCount();
         }
+
+
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

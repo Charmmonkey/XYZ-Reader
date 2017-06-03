@@ -1,15 +1,11 @@
 package com.example.xyzreader.ui;
 
 
-import android.app.LoaderManager;
-import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Html;
-import android.text.format.DateUtils;
-import android.text.method.LinkMovementMethod;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,8 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -36,7 +30,7 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2,1,1);
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
-
+    private String TAG = "BlankFragment.java";
 
 
     public BlankFragment() {
@@ -51,10 +45,11 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
         return fragment;
     }
 
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        int position = this.getArguments().getInt(ARTICLE_POSITION_KEY);
-        return ArticleLoader.newInstanceForItemId(getContext(), position);
+
+        return ArticleLoader.newAllArticlesInstance(getActivity());
     }
 
 
@@ -62,12 +57,13 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         mCursor = cursor;
 
-
+        bindViews();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mCursor = null;
+        Log.d(TAG, "reset");
     }
 
 
@@ -75,18 +71,21 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        int position = this.getArguments().getInt(ARTICLE_POSITION_KEY);
+
+        Log.d("MainActivity.java", "fragment view created, position: " + position);
+
+        getLoaderManager().initLoader(position, null, this);
 
 
         mRootView = inflater.inflate(R.layout.fragment_blank, container, false);
+
         return mRootView;
     }
 
     @Override
-    public void onStart() {
-        TextView textView = (TextView) getActivity().findViewById(R.id.fragment_text);
-        textView.setText("Fragment Page: " + this.getArguments());
-
-        super.onStart();
+    public void onResume() {
+        super.onResume();
     }
 
     private void bindViews() {
@@ -94,45 +93,41 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
             return;
         }
 
-        TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
-        TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
-        bylineView.setMovementMethod(new LinkMovementMethod());
-        TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
-
-
-        bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
-
-        if (mCursor != null) {
-            mRootView.setAlpha(0);
-            mRootView.setVisibility(View.VISIBLE);
-            mRootView.animate().alpha(1);
-            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
-            Date publishedDate = parsePublishedDate();
-            if (!publishedDate.before(START_OF_EPOCH.getTime())) {
-                bylineView.setText(Html.fromHtml(
-                        DateUtils.getRelativeTimeSpanString(
-                                publishedDate.getTime(),
-                                System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-                                DateUtils.FORMAT_ABBREV_ALL).toString()
-                                + " by <font color='#ffffff'>"
-                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + "</font>"));
-
-            } else {
-                // If date is before 1902, just show the string
-                bylineView.setText(Html.fromHtml(
-                        outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
-                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + "</font>"));
-
-            }
-            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+        TextView titleView = (TextView) mRootView.findViewById(R.id.fragment_text);
+        int position = this.getArguments().getInt(ARTICLE_POSITION_KEY);
+        if (mCursor.moveToPosition(position)) {
+            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE)+
+                    mCursor.getString(ArticleLoader.Query.TITLE)+
+                    mCursor.getString(ArticleLoader.Query.TITLE)
+            );
+//            Date publishedDate = parsePublishedDate();
+//            if (!publishedDate.before(START_OF_EPOCH.getTime())) {
+//                bylineView.setText(Html.fromHtml(
+//                        DateUtils.getRelativeTimeSpanString(
+//                                publishedDate.getTime(),
+//                                System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
+//                                DateUtils.FORMAT_ABBREV_ALL).toString()
+//                                + " by <font color='#ffffff'>"
+//                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
+//                                + "</font>"));
+//
+//            } else {
+//                // If date is before 1902, just show the string
+//                bylineView.setText(Html.fromHtml(
+//                        outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
+//                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
+//                                + "</font>"));
+//
+//            }
+//            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
 
         } else {
+            Log.d(TAG, "else");
+
             mRootView.setVisibility(View.GONE);
             titleView.setText("N/A");
-            bylineView.setText("N/A");
-            bodyView.setText("N/A");
+//            bylineView.setText("N/A");
+//            bodyView.setText("N/A");
         }
     }
 
@@ -147,4 +142,9 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+    }
 }
