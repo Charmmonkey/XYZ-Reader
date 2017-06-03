@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.example.xyzreader.R;
 
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity {
     private ViewPager mPager;
     private String TAG = "MainActivity.java";
@@ -20,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ButterKnife.bind(this);
 
         Bundle bundle = getIntent().getExtras();
         selectedItemPosition = bundle.getInt(ArticleListActivity.ACTION_ARTICLE_CLICK);

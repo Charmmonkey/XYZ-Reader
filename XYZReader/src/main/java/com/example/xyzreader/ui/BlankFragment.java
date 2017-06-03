@@ -2,23 +2,34 @@ package com.example.xyzreader.ui;
 
 
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,7 +42,7 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     private String TAG = "BlankFragment.java";
-
+    private List<String> bodyList;
 
     public BlankFragment() {
         // Required empty public constructor
@@ -93,33 +104,47 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
             return;
         }
 
-        TextView titleView = (TextView) mRootView.findViewById(R.id.fragment_text);
+        ImageView imageView = (ImageView) mRootView.findViewById(R.id.article_image);
+        TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
+        TextView dateView = (TextView) mRootView.findViewById(R.id.article_date);
+        RecyclerView bodyRecyclerview = (RecyclerView) mRootView.findViewById(R.id.article_body_list);
+        bodyRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        bodyRecyclerview.setAdapter(new ArticleAdapter());
+
         int position = this.getArguments().getInt(ARTICLE_POSITION_KEY);
         if (mCursor.moveToPosition(position)) {
-            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE)+
-                    mCursor.getString(ArticleLoader.Query.TITLE)+
-                    mCursor.getString(ArticleLoader.Query.TITLE)
-            );
-//            Date publishedDate = parsePublishedDate();
-//            if (!publishedDate.before(START_OF_EPOCH.getTime())) {
-//                bylineView.setText(Html.fromHtml(
-//                        DateUtils.getRelativeTimeSpanString(
-//                                publishedDate.getTime(),
-//                                System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-//                                DateUtils.FORMAT_ABBREV_ALL).toString()
-//                                + " by <font color='#ffffff'>"
-//                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-//                                + "</font>"));
-//
-//            } else {
-//                // If date is before 1902, just show the string
-//                bylineView.setText(Html.fromHtml(
-//                        outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
-//                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-//                                + "</font>"));
-//
-//            }
-//            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+            String articlePhotoUrl = mCursor.getString(ArticleLoader.Query.PHOTO_URL);
+
+            Glide.with(getActivity())
+                    .load(articlePhotoUrl)
+                    .asBitmap()
+                    .into();
+
+            bodyList = Arrays.asList(mCursor.getString(ArticleLoader.Query.BODY).split("\r\n|\n"));
+
+            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+
+
+            Date publishedDate = parsePublishedDate();
+            if (!publishedDate.before(START_OF_EPOCH.getTime())) {
+                dateView.setText(Html.fromHtml(
+                        DateUtils.getRelativeTimeSpanString(
+                                publishedDate.getTime(),
+                                System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
+                                DateUtils.FORMAT_ABBREV_ALL).toString()
+                                + " by <font color='#ffffff'>"
+                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
+                                + "</font>"));
+
+            } else {
+                // If date is before 1902, just show the string
+                dateView.setText(Html.fromHtml(
+                        outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
+                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
+                                + "</font>"));
+
+            }
+//            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY)));
 
         } else {
             Log.d(TAG, "else");
@@ -147,4 +172,34 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onPause();
 
     }
+    public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
+        @Override
+        public void onBindViewHolder(ArticleViewHolder holder, int position) {
+            holder.bodyView.setText(bodyList.get(position));
+        }
+
+        @Override
+        public ArticleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_test, parent,false);
+            return new ArticleViewHolder(view);
+        }
+
+        @Override
+        public int getItemCount() {
+            return bodyList.size();
+        }
+    }
+
+    private static class ArticleViewHolder extends RecyclerView.ViewHolder {
+        public TextView bodyView;
+
+        public ArticleViewHolder(View view){
+            super(view);
+            bodyView = (TextView) view.findViewById(R.id.article_body);
+        }
+
+    }
+
+
+
 }
