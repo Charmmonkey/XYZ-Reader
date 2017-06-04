@@ -4,6 +4,7 @@ package com.example.xyzreader.ui;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 
@@ -99,6 +101,7 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onResume();
     }
 
+
     private void bindViews() {
         if (mRootView == null) {
             return;
@@ -115,12 +118,21 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
         if (mCursor.moveToPosition(position)) {
             String articlePhotoUrl = mCursor.getString(ArticleLoader.Query.PHOTO_URL);
 
-            Glide.with(getActivity())
-                    .load(articlePhotoUrl)
+            Glide.with(getContext())
                     .asBitmap()
-                    .into();
+                    .load(articlePhotoUrl)
+                    .into(new BitmapImageViewTarget(imageView){
+                        @Override
+                        public void onResourceReady(Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            super.onResourceReady(resource, transition);
+                            Palette.Builder paletteBuilder = Palette.from(resource);
+                            int mutedColor = paletteBuilder.generate().getMutedColor(0xFF333333);
+                            mRootView.findViewById(R.id.meta_bar).setBackgroundColor(mutedColor);
+                        }
+                    });
 
             bodyList = Arrays.asList(mCursor.getString(ArticleLoader.Query.BODY).split("\r\n|\n"));
+            bodyList = bodyList.subList(0,20);
 
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
 

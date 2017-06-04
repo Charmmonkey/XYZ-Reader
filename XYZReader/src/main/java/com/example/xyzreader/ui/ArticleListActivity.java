@@ -14,8 +14,10 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.UpdaterService;
@@ -153,10 +155,11 @@ public class ArticleListActivity extends AppCompatActivity implements
 //                                thumbnail.getTransitionName())
 //                                .toBundle();
 //
-//                        startActivity(new Intent(Intent.ACTION_VIEW,
-//                                ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))), bundle);
+//                        Intent intent = new Intent(ArticleListActivity.this, MainActivity.class)
+//                                .putExtra(ACTION_ARTICLE_CLICK, vh.getAdapterPosition());
+//                        startActivity(intent, bundle);
+//
 //                    } else {
-                    Log.d(TAG, "Adapter position: " + vh.getAdapterPosition());
                     Intent intent = new Intent(ArticleListActivity.this, MainActivity.class)
                             .putExtra(ACTION_ARTICLE_CLICK, vh.getAdapterPosition());
                     startActivity(intent);
@@ -182,6 +185,7 @@ public class ArticleListActivity extends AppCompatActivity implements
             mCursor.moveToPosition(position);
             holder.titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             Date publishedDate = parsePublishedDate();
+            Glide.with(ArticleListActivity.this).load(mCursor.getString(ArticleLoader.Query.THUMB_URL)).into(holder.thumbnailView);
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
 
                 holder.subtitleView.setText(Html.fromHtml(
@@ -197,10 +201,7 @@ public class ArticleListActivity extends AppCompatActivity implements
                                 + "<br/>" + " by "
                                 + mCursor.getString(ArticleLoader.Query.AUTHOR)));
             }
-            holder.thumbnailView.setImageUrl(
-                    mCursor.getString(ArticleLoader.Query.THUMB_URL),
-                    ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());
-            holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
+
         }
 
         @Override
@@ -212,13 +213,13 @@ public class ArticleListActivity extends AppCompatActivity implements
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public DynamicHeightNetworkImageView thumbnailView;
+        public ImageView thumbnailView;
         public TextView titleView;
         public TextView subtitleView;
 
         public ViewHolder(View view) {
             super(view);
-            thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
+            thumbnailView = (ImageView) view.findViewById(R.id.thumbnail);
             titleView = (TextView) view.findViewById(R.id.article_title);
             subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
         }

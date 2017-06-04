@@ -19,6 +19,17 @@ public class MainActivity extends AppCompatActivity {
     private int selectedItemPosition = -1;
 
     @Override
+    public void onEnterAnimationComplete() {
+        Log.d(TAG, "enter animation complete");
+        super.onEnterAnimationComplete();
+//        CoordinatorLayout nestedScrollView = (CoordinatorLayout) findViewById(R.id.article_coordinator);
+//        final int startScrollPosition = getResources().getDimensionPixelSize(R.dimen.scroll_up_initial_distance);
+//        Animator animator = ObjectAnimator.ofInt(nestedScrollView,"scrollY",startScrollPosition)
+//                .setDuration(500);
+//        animator.start();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -35,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                            }
+            }
 
             @Override
             public void onPageSelected(int position) {
@@ -51,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class SimpleFragmentPageAdapter extends FragmentStatePagerAdapter {
 
-        public SimpleFragmentPageAdapter(FragmentManager fm){
+        public SimpleFragmentPageAdapter(FragmentManager fm) {
             super(fm);
         }
 
