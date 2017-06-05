@@ -34,7 +34,7 @@ import java.util.GregorianCalendar;
 /**
  * An activity representing a list of Articles. This activity has different presentations for
  * handset and tablet-size devices. On handsets, the activity presents a list of items, which when
- * touched, lead to a {@link ArticleDetailActivity} representing item details. On tablets, the
+ * touched, lead to a representing item details. On tablets, the
  * activity presents a grid of items as cards.
  */
 public class ArticleListActivity extends AppCompatActivity implements
@@ -155,7 +155,7 @@ public class ArticleListActivity extends AppCompatActivity implements
 //                        startActivity(intent, bundle);
 //
 //                    } else {
-                    Intent intent = new Intent(ArticleListActivity.this, MainActivity.class)
+                    Intent intent = new Intent(ArticleListActivity.this, ArticleDetailActivity.class)
                             .putExtra(ACTION_ARTICLE_CLICK, vh.getAdapterPosition());
                     startActivity(intent);
 //                    }

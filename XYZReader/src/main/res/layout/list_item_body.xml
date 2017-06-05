@@ -5,8 +5,7 @@
     android:layout_height="wrap_content"
     android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier"
     android:textColor="?android:textColorSecondary"
-    android:textSize="@dimen/detail_body_text_size"
-    tools:context="com.example.xyzreader.ui.TestFragment">
+    android:textSize="@dimen/detail_body_text_size">
 
 
 </TextView>

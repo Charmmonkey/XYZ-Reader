@@ -23,21 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.ArticleDetailActivity"
-            android:parentActivityName=".ui.ArticleListActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="vnd.android.cursor.item/vnd.com.example.xyzreader.items" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.ArticleListActivity" />
-        </activity>
 
         <service
             android:name=".data.UpdaterService"
@@ -49,7 +34,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.ArticleDetailActivity"
             android:parentActivityName=".ui.ArticleListActivity"
             android:label="@string/title_activity_main">
 
