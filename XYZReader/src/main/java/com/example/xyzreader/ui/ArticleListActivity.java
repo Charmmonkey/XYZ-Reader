@@ -1,5 +1,6 @@
 package com.example.xyzreader.ui;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
@@ -68,11 +69,6 @@ public class ArticleListActivity extends AppCompatActivity implements
 
         mToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
-
-        final View toolbarContainerView = findViewById(R.id.toolbar_container);
-
-//        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         getSupportLoaderManager().initLoader(0, null, this);
 
@@ -83,19 +79,6 @@ public class ArticleListActivity extends AppCompatActivity implements
 
     private void refresh() {
         startService(new Intent(this, UpdaterService.class));
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-//        registerReceiver(mRefreshingReceiver,
-//                new IntentFilter(UpdaterService.BROADCAST_ACTION_STATE_CHANGE));
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-//        unregisterReceiver(mRefreshingReceiver);
     }
 
 
@@ -142,23 +125,23 @@ public class ArticleListActivity extends AppCompatActivity implements
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                        ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-//
-//                        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,
-//                                thumbnail,
-//                                thumbnail.getTransitionName())
-//                                .toBundle();
-//
-//                        Intent intent = new Intent(ArticleListActivity.this, MainActivity.class)
-//                                .putExtra(ACTION_ARTICLE_CLICK, vh.getAdapterPosition());
-//                        startActivity(intent, bundle);
-//
-//                    } else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
+
+                        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,
+                                thumbnail,
+                                thumbnail.getTransitionName())
+                                .toBundle();
+
+                        Intent intent = new Intent(ArticleListActivity.this, ArticleDetailActivity.class)
+                                .putExtra(ACTION_ARTICLE_CLICK, vh.getAdapterPosition());
+                        startActivity(intent, bundle);
+
+                    } else {
                     Intent intent = new Intent(ArticleListActivity.this, ArticleDetailActivity.class)
                             .putExtra(ACTION_ARTICLE_CLICK, vh.getAdapterPosition());
                     startActivity(intent);
-//                    }
+                    }
                 }
             });
             return vh;

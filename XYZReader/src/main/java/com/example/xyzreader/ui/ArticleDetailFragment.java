@@ -148,12 +148,11 @@ public class ArticleDetailFragment extends Fragment implements LoaderManager.Loa
                             imageView.setVisibility(View.VISIBLE);
 
                             Log.d(TAG, "resource ready");
-//                            Drawable mDrawable = getContext().getResources().getDrawable(R.drawable.background_fade_up, null);
-//                            mDrawable.setColorFilter(new
-//                                    PorterDuffColorFilter(mutedColor, PorterDuff.Mode.MULTIPLY));
+//
                             mRootView.findViewById(R.id.meta_bar).setBackgroundColor(mutedColor);
                         }
                     });
+
 
             bodyList = Arrays.asList(mCursor.getString(ArticleLoader.Query.BODY).split("\r\n|\n"));
             bodyList = bodyList.subList(0, 20);
