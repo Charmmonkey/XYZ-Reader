@@ -1,12 +1,14 @@
 package com.example.xyzreader.ui;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -40,11 +43,13 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
     public static final String ARTICLE_POSITION_KEY = "position";
     private Cursor mCursor;
     private View mRootView;
-    private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2,1,1);
+    private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2, 1, 1);
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     private String TAG = "BlankFragment.java";
     private List<String> bodyList;
+    private ProgressBar progressBar;
+    private ImageView greyImageView, imageView;
 
     public BlankFragment() {
         // Required empty public constructor
@@ -69,7 +74,6 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         mCursor = cursor;
-
         bindViews();
     }
 
@@ -93,6 +97,15 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
 
         mRootView = inflater.inflate(R.layout.fragment_blank, container, false);
 
+        mRootView.findViewById(R.id.article_fab).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
+                        .setType("text/plain")
+                        .setText("Some sample text")
+                        .getIntent(), getString(R.string.action_share)));
+            }
+        });
         return mRootView;
     }
 
@@ -107,9 +120,11 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
             return;
         }
 
-        ImageView imageView = (ImageView) mRootView.findViewById(R.id.article_image);
+        imageView = (ImageView) mRootView.findViewById(R.id.article_image);
         TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
         TextView dateView = (TextView) mRootView.findViewById(R.id.article_date);
+        progressBar = (ProgressBar) mRootView.findViewById(R.id.progress_bar);
+        greyImageView = (ImageView) mRootView.findViewById(R.id.image_grey);
         RecyclerView bodyRecyclerview = (RecyclerView) mRootView.findViewById(R.id.article_body_list);
         bodyRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         bodyRecyclerview.setAdapter(new ArticleAdapter());
@@ -121,18 +136,27 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
             Glide.with(getContext())
                     .asBitmap()
                     .load(articlePhotoUrl)
-                    .into(new BitmapImageViewTarget(imageView){
+                    .into(new BitmapImageViewTarget(imageView) {
                         @Override
                         public void onResourceReady(Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             super.onResourceReady(resource, transition);
                             Palette.Builder paletteBuilder = Palette.from(resource);
                             int mutedColor = paletteBuilder.generate().getMutedColor(0xFF333333);
+
+                            progressBar.setVisibility(View.GONE);
+                            greyImageView.setVisibility(View.GONE);
+                            imageView.setVisibility(View.VISIBLE);
+
+                            Log.d(TAG, "resource ready");
+//                            Drawable mDrawable = getContext().getResources().getDrawable(R.drawable.background_fade_up, null);
+//                            mDrawable.setColorFilter(new
+//                                    PorterDuffColorFilter(mutedColor, PorterDuff.Mode.MULTIPLY));
                             mRootView.findViewById(R.id.meta_bar).setBackgroundColor(mutedColor);
                         }
                     });
 
             bodyList = Arrays.asList(mCursor.getString(ArticleLoader.Query.BODY).split("\r\n|\n"));
-            bodyList = bodyList.subList(0,20);
+            bodyList = bodyList.subList(0, 20);
 
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
 
@@ -184,6 +208,7 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onPause();
 
     }
+
     public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
         @Override
         public void onBindViewHolder(ArticleViewHolder holder, int position) {
@@ -192,7 +217,7 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
 
         @Override
         public ArticleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_test, parent,false);
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_test, parent, false);
             return new ArticleViewHolder(view);
         }
 
@@ -205,13 +230,12 @@ public class BlankFragment extends Fragment implements LoaderManager.LoaderCallb
     private static class ArticleViewHolder extends RecyclerView.ViewHolder {
         public TextView bodyView;
 
-        public ArticleViewHolder(View view){
+        public ArticleViewHolder(View view) {
             super(view);
             bodyView = (TextView) view.findViewById(R.id.article_body);
         }
 
     }
-
 
 
 }
